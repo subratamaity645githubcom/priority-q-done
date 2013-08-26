@@ -1,0 +1,229 @@
+
+
+    Explore
+    Gist
+    Blog
+    Help
+
+    subratamaity645githubcom
+    !
+
+You don't have any verified emails. We recommend verifying at least one email.
+
+Email verification helps our support team help you in case you have any email issues or lose your password.
+
+    1
+    0
+    0
+
+public bhenu/class_work
+
+Browse code
+
+priority queue done
+
+    master
+
+commit 2f662b7465b76d6d3b4ca0002187f75ed243275f 1 parent 964e6f5
+bhenu authored 15 days ago
+
+Showing 3 changed files with 194 additions and 0 deletions.
+80  calculator/src/pfxcal.c
+@@ -0,0 +1,80 @@
++/* function prototypes */
++int getorder(char);
++double pfxcal(char exps[]);
++
++/* main function */
++int pfxcal(int argc, char *argv[])
++{
++    char postfix[MAXOP];
++    char op[20];
++    int type;
++    double v1, v2;
++
++    if(argc < 2)
++    {
++        puts("Usage: ./pfxcal.o \"POSTFIX_EXPRESSION\"\n");
++        return 0;
++    }
++    else
++    {
++        strcpy(postfix, argv[1]);
++        type = getop(postfix, op);
++        while(op[0] != '\0')
++        {
++            if (type)
++            {
++                if(!push(atof(op)))
++                    printf("error: can't push\n");
++            }
++            else
++            {
++                switch (op[0])
++                {
++                    case '+':   pop(&v1);
++                                pop(&v2);
++                                push((v2 + v1));
++                                break;
++                    case '-':   pop(&v1);
++                                pop(&v2);
++                                push((v2 - v1));
++                                break;
++                    case '*':   pop(&v1);
++                                pop(&v2);
++                                push((v2 * v1));
++                                break;
++                    case '/':   pop(&v1);
++                                pop(&v2);
++                                push((v2 / v1));
++                                break;
++                    default:    printf("error:wrong input %c\n", op[0]);
++                                break;
++                }
++            }
++
++            type = getop(postfix, op);
++        }
++
++        /*  print the result */
++        if (pos > 0)
++            printf("something went wrong. check if the input is correct.\n");
++        else
++            printf("result: %.2f\n", Stack[pos]);
++
++    }
++
++    return 0;
++}
++
++/* definition of get precedance order */
++int getorder(char c)
++{
++    char order[] = "-+/*";
++    int i;
++
++    for (i = 0; order[i] != c && i < 4; i++)
++        ;
++    if (i == 4)
++        return -1;
++    else
++        return i;
++}
+BIN  day4/pQ
+Binary file not shown
+114  day4/pQ.c
+... 	... 	@@ -0,0 +1,114 @@
+  	1 	+#include <stdio.h>
+  	2 	+#include <stdlib.h>
+  	3 	+#include <string.h>
+  	4 	+#include <ctype.h>
+  	5 	+
+  	6 	+#define QSIZE 20
+  	7 	+
+  	8 	+/* structure to hold the priority queue */
+  	9 	+static struct Pqueue
+  	10 	+{
+  	11 	+    struct element
+  	12 	+    {
+  	13 	+        int value;
+  	14 	+        int priority;
+  	15 	+    } e[QSIZE];
+  	16 	+
+  	17 	+    int rear_pos;
+  	18 	+};
+  	19 	+
+  	20 	+/* prototype definition for queue operations */
+  	21 	+int insert(int, int, struct Pqueue *);
+  	22 	+int delete(int *, struct Pqueue *);
+  	23 	+void display(struct Pqueue);
+  	24 	+
+  	25 	+/* ############################  MAIN  ############################## */
+  	26 	+
+  	27 	+int main(void)
+  	28 	+{
+  	29 	+    /* initialise rear queue */
+  	30 	+    struct Pqueue Q1;
+  	31 	+    Q1.rear_pos = -1;
+  	32 	+
+  	33 	+    int n = 5;
+  	34 	+    int value, priority, deleted;
+  	35 	+
+  	36 	+    while(n != 0)
+  	37 	+        {
+  	38 	+            printf("## 1: insert\n## 2: delete\n## 3: display\n## 0: quit\n");
+  	39 	+            scanf("%d", &n);
+  	40 	+            switch(n)
+  	41 	+            {
+  	42 	+                case 1:
+  	43 	+                        printf("Enter the value(integer type) to insert\n");
+  	44 	+                        scanf("%d", &value);
+  	45 	+                        printf("Enter its priority (also integer type)\n");
+  	46 	+                        scanf("%d", &priority);
+  	47 	+                        insert(value, priority, &Q1);
+  	48 	+                        break;
+  	49 	+                case 2:
+  	50 	+                        delete(&deleted, &Q1);
+  	51 	+                        printf("deleted from queue: %d\n", deleted);
+  	52 	+                        break;
+  	53 	+                case 3: display(Q1);
+  	54 	+                        break;
+  	55 	+                default:
+  	56 	+                        printf("error: wrong input.\n");
+  	57 	+                        break;
+  	58 	+            }
+  	59 	+        }
+  	60 	+
+  	61 	+    return 0;
+  	62 	+}
+  	63 	+
+  	64 	+/* definition of display */
+  	65 	+void display(struct Pqueue Q)
+  	66 	+{
+  	67 	+    int i;
+  	68 	+
+  	69 	+    printf("Queue [value | priority]: \n");
+  	70 	+
+  	71 	+    for (i = Q.rear_pos; i > -1; i--)
+  	72 	+        printf("[ %d | %d ] ", Q.e[i].value, Q.e[i].priority);
+  	73 	+
+  	74 	+    printf("\n");
+  	75 	+
+  	76 	+}
+  	77 	+
+  	78 	+/* definition of insert */
+  	79 	+int insert(int value, int priority, struct Pqueue *Q)
+  	80 	+{
+  	81 	+    if( Q->rear_pos >= QSIZE)
+  	82 	+    {
+  	83 	+        printf("error: Queue is full!\n");
+  	84 	+        return 0;
+  	85 	+    }
+  	86 	+    else
+  	87 	+    {
+  	88 	+        Q->e[++(Q->rear_pos)].value = value;
+  	89 	+        Q->e[Q->rear_pos].priority = priority;
+  	90 	+
+  	91 	+        return 1;
+  	92 	+    }
+  	93 	+}
+  	94 	+
+  	95 	+/* definition of delete */
+  	96 	+int delete(int *deleted, struct Pqueue *Q)
+  	97 	+{
+  	98 	+    int i, current;
+  	99 	+    for ( i = 0, current = 0; i <= Q->rear_pos; i++)
+  	100 	+        current = (Q->e[i].priority) > (Q->e[current].priority) ? i : current;
+  	101 	+
+  	102 	+    *deleted = (Q->e[current].value);
+  	103 	+
+  	104 	+    while ( current < Q->rear_pos)
+  	105 	+    {
+  	106 	+        Q->e[current] = Q->e[current+1];
+  	107 	+        current++;
+  	108 	+    }
+  	109 	+
+  	110 	+    Q->rear_pos--;
+  	111 	+    return 1;
+  	112 	+}
+
